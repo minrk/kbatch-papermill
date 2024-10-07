@@ -19,6 +19,7 @@ import yaml
 from kbatch import Job
 
 _user = os.environ.get("JUPYTERHUB_USER", "user")
+_default_code_dir = os.environ.get("KBATCH_S3_CODE_DIR", "")
 _job_py = Path(__file__).parent.resolve() / "_job.py"
 
 
@@ -74,7 +75,7 @@ def kbatch_papermill(
     s3_dest: str,
     job_name: str = "papermill",
     *,
-    s3_code_dir: str,
+    s3_code_dir: str = _default_code_dir,
     code_dir: str | None = None,
     profile_name: str = "default",
     env: dict[str, str] | None = None,
@@ -113,6 +114,9 @@ def kbatch_papermill(
             raise ValueError(f"{notebook_in_code} does not exist")
     else:
         relative_notebook = notebook.relative_to(notebook.parent)
+
+    if not s3_code_dir:
+        "Please specify s3_code_dir= or $KBATCH_S3_CODE_DIR"
 
     profile = kbatch._core.load_profile(profile_name)
 
