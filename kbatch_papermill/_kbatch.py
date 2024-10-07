@@ -20,18 +20,6 @@ def print_job_status():
     rich.print(kbatch._core.format_jobs(kbatch.list_jobs()))
 
 
-def job_logs(job_name: str) -> str:
-    """Retrieve the logs for a given job"""
-    pods = kbatch.list_pods(job_name=job_name)
-    logs = []
-    for pod in pods["items"]:
-        pod_name = pod["metadata"]["name"]
-        logs.append(f"{pod_name}: {pod['status']['phase']}")
-        if pod["status"]["phase"] != "Pending":
-            logs.append(kbatch.logs(pod_name))
-    return "\n".join(logs)
-
-
 def wait_for_jobs(*job_names, stop_on_failure=True, failure_logs=True):
     """Wait for one or more jobs by name
 
@@ -41,9 +29,7 @@ def wait_for_jobs(*job_names, stop_on_failure=True, failure_logs=True):
         stop_on_failure (bool): whether to stop waiting on the first failure
     """
     if not job_names:
-        existing_job_names = [
-            job["metadata"]["name"] for job in kbatch.list_jobs()["items"]
-        ]
+        job_names = [job["metadata"]["name"] for job in kbatch.list_jobs()["items"]]
     all_job_names = set(job_names)
     watch_job_names = set(all_job_names)
     failed = []
@@ -80,6 +66,6 @@ def wait_for_jobs(*job_names, stop_on_failure=True, failure_logs=True):
     progress.close()
     for job_name in failed:
         if failure_logs:
-            print(job_logs(job_name))
+            print(kbatch.job_logs(job_name))
         else:
             print(f"{job_name} failed")
