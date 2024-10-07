@@ -5,16 +5,21 @@ Submit papermill jobs
 import os
 import shutil
 import sys
+from datetime import datetime, timezone
 from fnmatch import fnmatch
 from pathlib import Path
+from secrets import token_urlsafe
+from shutil import make_archive
 from tempfile import TemporaryDirectory
 from typing import Any
 
 import kbatch
+import s3fs
 import yaml
 from kbatch import Job
 
 _user = os.environ.get("JUPYTERHUB_USER", "user")
+_job_py = Path(__file__).parent.resolve() / "_job.py"
 
 
 def _ignore_git(src, names):
@@ -26,12 +31,50 @@ def _ignore_git(src, names):
     return [".git", "build"] + [name for name in names if fnmatch(name, "*.egg-info")]
 
 
+def _upload_code_dir(
+    s3_base: str,
+    notebook,
+    parameters: dict[str, Any],
+    code_dir: Path | None = None,
+    s3: s3fs.S3FileSystem | None = None,
+) -> str:
+    """
+    Upload code directory to s3, return the URL
+    """
+    if s3 is None:
+        s3 = s3fs.S3FileSystem(anon=False)
+    s3_base = s3_base.rstrip("/")
+    now = datetime.now(timezone.utc)
+    date_path = now.strftime("%Y/%m/%d")
+    date_slug = now.strftime("%H%M%S")
+    random_slug = token_urlsafe(3)
+    code_name = f"{notebook.stem}-{date_slug}-{random_slug}"
+
+    code_url = f"{s3_base}/{date_path}/{code_name}.zip"
+    if s3.exists(code_url):
+        raise ValueError(f"{code_url} already exists!")
+    with TemporaryDirectory() as td:
+        td_path = Path(td)
+        temp_code = td_path / "code"
+        if code_dir:
+            shutil.copytree(code_dir, temp_code, ignore=_ignore_git, dirs_exist_ok=True)
+        else:
+            temp_code.mkdir()
+            shutil.copyfile(notebook, temp_code / notebook.name)
+        # add papermill params
+        with (temp_code / "_papermill_params.yaml").open("w") as f:
+            yaml.dump(parameters or {}, f)
+        zip_path = make_archive(td_path / "_code", "zip", temp_code)
+        s3.put_file(zip_path, code_url)
+    return code_url
+
+
 def kbatch_papermill(
     notebook: Path,
     s3_dest: str,
     job_name: str = "papermill",
     *,
-    s3_code_path: str = f"s3://gfts-ifremer/kbatch/{_user}",
+    s3_code_dir: str,
     code_dir: str | None = None,
     profile_name: str = "default",
     env: dict[str, str] | None = None,
@@ -73,18 +116,26 @@ def kbatch_papermill(
 
     profile = kbatch._core.load_profile(profile_name)
 
+    s3_code_url = _upload_code_dir(
+        s3_code_dir, notebook, parameters=parameters, code_dir=code_dir
+    )
+    environment["S3_CODE_URL"] = s3_code_url
+
     job = Job(
         name=job_name,
         image=os.environ["JUPYTER_IMAGE"],
         command=["mamba", "run", "--no-capture-output", "-p", sys.prefix],
         args=[
-            "papermill",
+            "python3",
+            _job_py.name,
             # progress bar doesn't work nicely in docker logs,
             # use log format instead
             "--log-output",
             "--no-progress-bar",
             # upload the notebook after each execution
             "--request-save-on-cell-execute",
+            # save every minute for long-running cells
+            "--autosave-cell-every=60",
             "-f",
             "_papermill_params.yaml",
             "--cwd",
@@ -94,14 +145,11 @@ def kbatch_papermill(
         ],
         env=environment,
     )
-    with TemporaryDirectory() as td:
-        td_path = Path(td)
-        if code_dir:
-            shutil.copytree(code_dir, td_path, ignore=_ignore_git, dirs_exist_ok=True)
-        else:
-            shutil.copyfile(notebook, td_path / notebook.name)
-        with (td_path / "_papermill_params.yaml").open("w") as f:
-            yaml.dump(parameters or {}, f)
-
-        kubernetes_job = kbatch.submit_job(job, profile=profile, code=td_path)
+    try:
+        kubernetes_job = kbatch.submit_job(job, profile=profile, code=_job_py)
+    except Exception:
+        # cleanup s3 if it fails
+        s3 = s3fs.S3FileSystem(anon=False)
+        s3.remove(s3_code_url)
+        raise
     return kubernetes_job["metadata"]["name"]
