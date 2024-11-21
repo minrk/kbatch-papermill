@@ -154,6 +154,6 @@ def kbatch_papermill(
     except Exception:
         # cleanup s3 if it fails
         s3 = s3fs.S3FileSystem(anon=False)
-        s3.remove(s3_code_url)
+        s3.rm(s3_code_url)
         raise
     return kubernetes_job["metadata"]["name"]
