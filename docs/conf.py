@@ -10,7 +10,7 @@ release = info["project"]["version"]
 author = info["project"]["authors"][0]["name"]
 copyright = f"2024, {author}"
 
-extensions = ["myst_parser", "sphinx.ext.autodoc"]
+extensions = ["myst_parser", "sphinx.ext.autodoc", "sphinx.ext.viewcode"]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
