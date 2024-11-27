@@ -1,7 +1,3 @@
-"""
-Run notebooks via kbatch, store output in s3
-"""
-
 from ._kbatch import print_job_status, wait_for_jobs
 from ._papermill import kbatch_papermill
 

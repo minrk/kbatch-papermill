@@ -16,17 +16,19 @@ from tqdm.notebook import tqdm
 
 
 def print_job_status():
-    """Print status of all kbatch jobs as a nice table"""
+    """Print the status of all kbatch jobs as a nice table."""
     rich.print(kbatch._core.format_jobs(kbatch.list_jobs()))
 
 
 def wait_for_jobs(*job_names, stop_on_failure=True, failure_logs=True):
-    """Wait for one or more jobs by name
+    """Wait for one or more jobs by name.
 
-    Default: wait for all jobs.
-
-    args:
-        stop_on_failure (bool): whether to stop waiting on the first failure
+    :param job_names: Job names, default to all names.
+    :type job_names: list[str]
+    :param stop_on_failure: Whether to stop waiting on the first failure, default to True.
+    :type stop_on_failure: bool
+    :param failure_logs: Whether to print the logs of failed logs, default to True.
+    :type failure_logs: bool
     """
     if not job_names:
         job_names = [job["metadata"]["name"] for job in kbatch.list_jobs()["items"]]
