@@ -1,8 +1,10 @@
 import os
 import tomli
 
-path = os.path.abspath("../pyproject.toml")
-with open(path, "rb") as f:
+from pathlib import Path
+
+pyproject_toml = Path(__file__).parents[1].resolve() / "pyproject.toml"
+with pyproject_toml.open("rb") as f:
     info = tomli.load(f)
 
 project = info["project"]["name"]
