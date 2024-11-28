@@ -13,18 +13,8 @@ copyright = f"2024, {author}"
 
 extensions = ["myst_parser", "sphinx.ext.autodoc", "sphinx.ext.viewcode", "sphinx.ext.napoleon"]
 
-templates_path = ["_templates"]
+templates_path = []
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "sphinx_rtd_theme"
-html_static_path = ["_static"]
-
-
-# see: https://stackoverflow.com/a/18031024
-def remove_module_docstring(app, what, name, obj, options, lines):
-    if what == "module" and name == "kbatch_papermill":
-        del lines[:]
-
-
-def setup(app):
-    app.connect("autodoc-process-docstring", remove_module_docstring)
+html_static_path = []
