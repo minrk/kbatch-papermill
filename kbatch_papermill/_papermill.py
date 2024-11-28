@@ -1,6 +1,8 @@
 """
-Submit papermill jobs
+Submit papermill jobs.
 """
+
+__all__ = ["kbatch_papermill"]
 
 import os
 import shutil
@@ -81,23 +83,19 @@ def kbatch_papermill(
     env: dict[str, str] | None = None,
     parameters: dict[str, Any] | None = None,
 ) -> str:
-    """Run a notebook with papermill and store the result in s3.
+    """
+    Run a notebook with Papermill and store the result in S3.
 
-    :param notebook: Path to notebook.
-    :type notebook: Path
-    :param s3_dest: s3 URL where the notebook should be stored (e.g. s3://bucket/path/to/notebook.ipynb).
-    :type s3_dest: str
-    :param job_name: Name prefix for the kbatch job, defaults to "papermill".
-    :type job_name: str
-    :param profile_name: Name of the profile to run with (specifies resource requirements), defaults to "default".
-    :type profile_name: str
-    :param env: Additional environment variables to set (other than "AWS\_" ones), default to None.
-    :type env: dict[str, str], optional
-    :param parameters: Papermill parameters to pass, default to None.
-    :type parameters: dict[str, Any], optional
+    Args:
+        notebook (Path): Path to the notebook.
+        s3_dest (str): S3 URL where the notebook should be stored (e.g., s3://bucket/path/to/notebook.ipynb).
+        job_name (str, optional): Name prefix for the kbatch job. Defaults to "papermill".
+        profile_name (str, optional): Name of the profile to run with (specifies resource requirements). Defaults to "default".
+        env (dict[str, str], optional): Additional environment variables to set (other than "AWS\_" ones). Defaults to None.
+        parameters (dict[str, Any], optional): Papermill parameters to pass. Defaults to None.
 
-    :return: Name of the kbatch job.
-    :rtype: str
+    Returns:
+        str: Name of the kbatch job.
     """
 
     notebook = Path(notebook)

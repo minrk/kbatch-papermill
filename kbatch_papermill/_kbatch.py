@@ -1,10 +1,10 @@
 """
-kbatch interface
-
-wraps kbatch for some nicer Python APIs
-
-Maybe some of this should be in kbatch
+Kbatch interface.
+It wraps kbatch with some nicer Python APIs.
+Maybe some of this should be in kbatch.
 """
+
+__all__ = ["print_job_status", "wait_for_jobs"]
 
 import time
 
@@ -21,14 +21,13 @@ def print_job_status():
 
 
 def wait_for_jobs(*job_names, stop_on_failure=True, failure_logs=True):
-    """Wait for one or more jobs by name.
+    """
+    Wait for one or more jobs by name.
 
-    :param job_names: Job names, default to all names.
-    :type job_names: list[str]
-    :param stop_on_failure: Whether to stop waiting on the first failure, default to True.
-    :type stop_on_failure: bool
-    :param failure_logs: Whether to print the logs of failed logs, default to True.
-    :type failure_logs: bool
+    Args:
+        job_names (list[str], optional): Job names. Defaults to all names.
+        stop_on_failure (bool, optional): Whether to stop waiting on the first failure. Defaults to True.
+        failure_logs (bool, optional): Whether to print the logs of failed jobs. Defaults to True.
     """
     if not job_names:
         job_names = [job["metadata"]["name"] for job in kbatch.list_jobs()["items"]]

@@ -5,5 +5,5 @@ Welcome to kbatch_papermill's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   readme.md
+   intro.md
    api

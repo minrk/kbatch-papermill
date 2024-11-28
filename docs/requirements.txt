@@ -1,10 +1,4 @@
 sphinx
 sphinx-rtd-theme
-kbatch
-ipython
-ipywidgets
-tqdm
-s3fs
-papermill
 myst-parser
 tomli
