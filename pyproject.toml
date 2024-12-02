@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "kbatch-papermill"
 version = "0.1.0.dev"
-dynamic = ["readme"]
+dynamic = ["readme", "dependencies"]
 description = "KBatch Papermill: Run papermill in kbatch"
 authors = [
   { name = "Min RK", email = "benjaminrk@gmail.com" },

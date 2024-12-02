@@ -1,6 +1,8 @@
 """
-Submit papermill jobs
+Submit papermill jobs.
 """
+
+__all__ = ["kbatch_papermill"]
 
 import os
 import shutil
@@ -81,15 +83,19 @@ def kbatch_papermill(
     env: dict[str, str] | None = None,
     parameters: dict[str, Any] | None = None,
 ) -> str:
-    """Run a notebook with papermill and store the result in s3
+    """
+    Run a notebook with Papermill and store the result in S3.
 
     Args:
-      notebook: path to notebook
-      s3_dest: s3 URL where the notebook should be stored (e.g. s3://bucket/path/to/notebook.ipynb)
-      job_name: name prefix for the kbatch job (default: papermill)
-      profile_name: name of the profile to run with (specifies resource requirements)
-      env: additional environment variables to set (AWS_ env will be set by default)
-      parameters: papermill parameters to pass
+        notebook (Path): Path to the notebook.
+        s3_dest (str): S3 URL where the notebook should be stored (e.g., s3://bucket/path/to/notebook.ipynb).
+        job_name (str, optional): Name prefix for the kbatch job. Defaults to "papermill".
+        profile_name (str, optional): Name of the profile to run with (specifies resource requirements). Defaults to "default".
+        env (dict[str, str], optional): Additional environment variables to set (other than "AWS\_" ones). Defaults to None.
+        parameters (dict[str, Any], optional): Papermill parameters to pass. Defaults to None.
+
+    Returns:
+        str: Name of the kbatch job.
     """
 
     notebook = Path(notebook)
