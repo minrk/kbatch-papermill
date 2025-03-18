@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 # ref: https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 [project]
 name = "kbatch-papermill"
-version = "0.1.0.dev"
+version = "0.1.0a1"
 dynamic = ["readme", "dependencies"]
 description = "KBatch Papermill: Run papermill in kbatch"
 authors = [
@@ -81,7 +81,7 @@ select = [
 github_url = "https://github.com/minrk/kbatch-papermill"
 
 [tool.tbump.version]
-current = "0.1.0.dev"
+current = "0.1.0a1"
 
 # Example of a semver regexp.
 # Make sure this matches current_version before
