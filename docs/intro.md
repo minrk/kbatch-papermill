@@ -9,7 +9,6 @@ Designed for [Destination-Earth GFTS](https://github.com/destination-earth/Desti
 3. $JUPYTER_IMAGE has `papermill`.
 4. We have read/write access to S3 for _both_ the code input directory and the output directory (completed job results).
 
-
 We also add some generic functionality to make a nicer Python API for kbatch, which should perhaps be upstreamed. See `_kbatch.py` for most of that.
 
 Besides, we overcome the size limit of the commonly used [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/) approach by passing the code directory (currently to S3) instead.

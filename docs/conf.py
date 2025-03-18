@@ -1,6 +1,6 @@
-import tomli
-
 from pathlib import Path
+
+import tomli
 
 pyproject_toml = Path(__file__).parents[1].resolve() / "pyproject.toml"
 with pyproject_toml.open("rb") as f:
@@ -11,7 +11,12 @@ release = info["project"]["version"]
 author = info["project"]["authors"][0]["name"]
 copyright = f"2024, {author}"
 
-extensions = ["myst_parser", "sphinx.ext.autodoc", "sphinx.ext.viewcode", "sphinx.ext.napoleon"]
+extensions = [
+    "myst_parser",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.napoleon",
+]
 
 templates_path = []
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
